@@ -28,13 +28,19 @@ class Scraper {
 
         console.log(`Waiting for selector "${waitForSelector}"..`);
         
-        await page.waitForSelector(waitForSelector);
+        try {
+            await page.waitForSelector(waitForSelector);
 
-        console.log('Done.');
+            console.log('Done.');
 
-        const response = await page.$$eval(selector, callback);
+            const response = await page.$$eval(selector, callback);
 
-        return [page, response];
+            return [page, response];
+        } catch (e) {
+            console.log('Failed.');
+
+            return [page, []];
+        }
     }
 
     protected async loadPage(url: string): Promise<Page> {
