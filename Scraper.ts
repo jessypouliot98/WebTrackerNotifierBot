@@ -19,16 +19,17 @@ class Scraper {
         return this;
     }
 
-    public async search(url: string, waitForSelector: string, selector: string, callback: (elements: Element[], ...args: unknown[]) => any): Promise<[Page, any]> {
-        console.log(`Loading ${url}`);
-        
-        const page = await this.loadPage(url);
+    public async search(url: string, waitForSelector: string, selector: string, callback: (elements: Element[], ...args: unknown[]) => any): Promise<[Page|undefined, any]> {
+        let page;
 
-        console.log('Page loaded.');
-
-        console.log(`Waiting for selector "${waitForSelector}"..`);
-        
         try {
+            console.log(`Loading ${url}`);
+            
+            page = await this.loadPage(url);
+    
+            console.log('Page loaded.');
+    
+            console.log(`Waiting for selector "${waitForSelector}"..`);
             await page.waitForSelector(waitForSelector);
 
             console.log('Done.');

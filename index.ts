@@ -89,7 +89,7 @@ async function scrapeKijiji({ scraper, discord }: { scraper: Scraper, discord: D
 
 	await Promise.all(messages);
 
-	await page.close();
+	await page?.close();
 }
 
 async function scrapeFacebookMarker({ scraper, discord }: { scraper: Scraper, discord: Discord }) {
@@ -137,7 +137,7 @@ async function scrapeFacebookMarker({ scraper, discord }: { scraper: Scraper, di
 
 	await Promise.all(messages);
 
-	await page.close();
+	await page?.close();
 }
 
 (async () => {
