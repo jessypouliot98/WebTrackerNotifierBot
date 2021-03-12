@@ -44,10 +44,16 @@ class Scraper {
         }
     }
 
-    protected async loadPage(url: string): Promise<Page> {
+    public async navigate(url: string, options?: any): Promise<[Page]> {
+        const page = await this.loadPage(url, options);
+        
+        return [page];
+    }
+
+    protected async loadPage(url: string, options?: any): Promise<Page> {
         const page: Page = await (this._browser as Browser).newPage();
 
-        await page.goto(url);
+        await page.goto(url, options);
 
         this._page = page;
 

@@ -1,8 +1,12 @@
-import DiscordJS, { Client } from 'discord.js';
+import DiscordJS, { Client, Message, Channel } from 'discord.js';
 
 class Discord {
 
     protected _client: Client;
+
+    get user() {
+        return this._client.user;
+    }
 
     public constructor() {
         this._client = new DiscordJS.Client();
@@ -27,9 +31,13 @@ class Discord {
     }
 
     async send(message: string, channelId: string = process.env.DISCORD_DEFAULT_CHANNEL as string) {
-        const channel = await this._client.channels.fetch(channelId) as any;
+        const channel: Channel = await this._client.channels.fetch(channelId);
 
-        await channel.send(message);
+        await (channel as unknown as { send: (message: string) => Promise<unknown> }).send(message);
+    }
+
+    async onMessage(onMessage: (message: Message) => void) {
+        this._client.on('message', onMessage);
     }
 
 }

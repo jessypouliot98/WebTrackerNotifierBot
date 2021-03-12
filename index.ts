@@ -13,7 +13,11 @@ const kijijiUrl = process.env.KIJIJI_URL;
 const facebookUrl = process.env.FACEBOOK_MARKER_URL;
 
 const kijijiSentPrefix = 'KIJIJI:';
-const facebookSentPrefix = 'FACEBOOK';
+const facebookSentPrefix = 'FACEBOOK:';
+
+const poopList = [
+	'4 1/2 très spacieux à louer à Saint-Lin LIBRE JUIN OU JUILLET',
+];
 
 // Vars
 let listingsSent: string[] = [];
@@ -140,10 +144,46 @@ async function scrapeFacebookMarker({ scraper, discord }: { scraper: Scraper, di
 	await page?.close();
 }
 
+async function loginFacebook({ scraper }: { scraper: Scraper }) {
+	console.log('Logging facebook');
+	
+	const [page] = await scraper.navigate('https://www.facebook.com/login');
+
+	await page.type('#email', process.env.FACEBOOK_EMAIL as string, { delay: 30 });
+	await page.type('#pass', process.env.FACEBOOK_PASSWORD as string, { delay: 30 });
+
+	await page.click('#loginbutton');
+
+	try {
+		await page.waitForNavigation({ waitUntil: 'networkidle0' });
+		console.log("successful login");
+	} catch (err) {
+		console.log("failed to login");
+	}
+}
+
 (async () => {
 	listingsSent = await loadCsv(databaseCSV);
 	const discord = await Discord.init();
 	const scraper = await Scraper.init();
+
+	discord.onMessage(message => {
+		if (message.author.id === discord.user?.id) {
+			if (poopList.some(text => message.content.includes(text))) {
+				message.react('💩');
+			}
+
+			return;
+		}
+
+		if (message.content === 'ping') {
+			discord.send('pong', message.channel.id);
+		} else if (message.content === 'pong') {
+			discord.send('ping', message.channel.id);
+		}
+	});
+
+	await loginFacebook({ scraper });
 	
 	rerunAfter(parseInt(process.env.CYCLE_TIMEOUT as string), async() => {
 		await scrapeFacebookMarker({ scraper, discord });
